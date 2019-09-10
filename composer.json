@@ -1,0 +1,17 @@
+{
+    "name": "appslabke/laravel-easy-search",
+    "description": "Simplified Laravel search",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Marvin",
+            "email": "marvin@appslab.co.ke"
+        }
+    ],
+    "minimum-stability": "beta",
+    "require": {},
+    "require-dev": {
+        "orchestra/testbench": "^4.0"
+    }
+}
