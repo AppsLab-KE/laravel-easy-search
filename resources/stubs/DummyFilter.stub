@@ -1,0 +1,22 @@
+<?php
+/**
+ * Created by PhpStorm.
+ * User: marvincollins
+ * Date: 12/19/18
+ * Time: 10:17 PM
+ */
+
+namespace DummyNamespace;
+
+
+use AppsLab\LaravelEasySearch\Contracts\FilterInterface;
+use Illuminate\Database\Eloquent\Builder;
+DummyCarbon
+
+class DummyClass implements FilterInterface
+{
+    public static function apply(Builder $builder, $value)
+    {
+        return $builder->where('id',$value);
+    }
+}

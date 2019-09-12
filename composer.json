@@ -3,15 +3,46 @@
     "description": "Simplified Laravel search",
     "type": "library",
     "license": "MIT",
+    "keywords": [
+        "appslab",
+        "laravel-easy-search",
+        "laravel search"
+    ],
+    "homepage": "https://github.com/AppsLab-KE/laravel-easy-search",
     "authors": [
         {
             "name": "Marvin",
-            "email": "marvin@appslab.co.ke"
+            "homepage": "https://appslab.co.ke",
+            "email": "marvin@appslab.co.ke",
+            "role": "Ceo and Developer"
         }
     ],
     "minimum-stability": "beta",
-    "require": {},
+    "require": {
+        "php": "^7.1"
+    },
     "require-dev": {
         "orchestra/testbench": "^4.0"
+    },
+    "autoload": {
+        "files": [
+            "src/Support/Constant.php",
+            "src/Support/helper.php"
+        ],
+        "psr-4": {
+            "AppsLab\\LaravelEasySearch\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "AppsLab\\LaravelEasySearch\\Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "AppsLab\\LaravelEasySearch\\LaravelEasySearchBaseServiceProvider"
+            ]
+        }
     }
 }
