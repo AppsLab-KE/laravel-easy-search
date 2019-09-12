@@ -1,2 +1,2 @@
-# laravel-easy-search
+# Laravel-Easy-Search
 Laravel Easy Search
