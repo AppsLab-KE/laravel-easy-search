@@ -1,48 +1,49 @@
 {
-    "name": "appslabke/laravel-easy-search",
-    "description": "Simplified Laravel search",
-    "type": "library",
-    "license": "MIT",
-    "keywords": [
-        "appslab",
-        "laravel-easy-search",
-        "laravel search"
-    ],
-    "homepage": "https://github.com/AppsLab-KE/laravel-easy-search",
-    "authors": [
-        {
-            "name": "Marvin",
-            "homepage": "https://appslab.co.ke",
-            "email": "marvin@appslab.co.ke",
-            "role": "Ceo and Developer"
-        }
-    ],
-    "minimum-stability": "beta",
-    "require": {
-        "php": "^7.1"
-    },
-    "require-dev": {
-        "orchestra/testbench": "^4.0"
-    },
-    "autoload": {
-        "files": [
-            "src/Support/Constant.php",
-            "src/Support/helper.php"
-        ],
-        "psr-4": {
-            "AppsLab\\LaravelEasySearch\\": "src/"
-        }
-    },
-    "autoload-dev": {
-        "psr-4": {
-            "AppsLab\\LaravelEasySearch\\Tests\\": "tests/"
-        }
-    },
-    "extra": {
-        "laravel": {
-            "providers": [
-                "AppsLab\\LaravelEasySearch\\LaravelEasySearchBaseServiceProvider"
-            ]
-        }
+  "name": "appslabke/laravel-easy-search",
+  "description": "Simplified Laravel search",
+  "type": "library",
+  "license": "MIT",
+  "keywords": [
+    "appslab",
+    "laravel-easy-search",
+    "laravel search"
+  ],
+  "homepage": "https://github.com/AppsLab-KE/laravel-easy-search",
+  "authors": [
+    {
+      "name": "Marvin",
+      "homepage": "https://appslab.co.ke",
+      "email": "marvin@appslab.co.ke",
+      "role": "Ceo and Developer"
     }
+  ],
+  "minimum-stability": "beta",
+  "require": {
+    "php": "^7.1",
+    "doctrine/dbal": "^2.8"
+  },
+  "require-dev": {
+    "orchestra/testbench": "^4.0"
+  },
+  "autoload": {
+    "files": [
+      "src/Support/Constant.php",
+      "src/Support/helper.php"
+    ],
+    "psr-4": {
+      "AppsLab\\LaravelEasySearch\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "AppsLab\\LaravelEasySearch\\Tests\\": "tests/"
+    }
+  },
+  "extra": {
+    "laravel": {
+      "providers": [
+        "AppsLab\\LaravelEasySearch\\LaravelEasySearchBaseServiceProvider"
+      ]
+    }
+  }
 }

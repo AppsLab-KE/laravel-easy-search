@@ -6,7 +6,7 @@ namespace AppsLab\LaravelEasySearch\Contracts;
 
 class GeneratorCommand extends \Illuminate\Console\GeneratorCommand
 {
-    protected $dummyCarbon = '';
+//    protected $dummyImports = '';
     /**
      * Get the stub file for the generator.
      *
@@ -28,13 +28,13 @@ class GeneratorCommand extends \Illuminate\Console\GeneratorCommand
         return $this;
     }
 
-    protected function replaceClass($stub, $name)
+    protected function replaceClass($stub, $data)
     {
-        $class = str_replace($this->getNamespace($name).'\\', '', $name);
+        $class = str_replace($this->getNamespace($data['name']).'\\', '', $data['name']);
 
         return str_replace(
-            ['DummyClass', 'DummyCarbon'],
-            [$class, $this->dummyCarbon.$this->dummyCarbon == '' ? '' : ";"],
+            ['DummyClass', 'DummyQuery', 'DummyColumn', 'DummyCondition'],
+            [$class, $data['query'], $data['column'], $data['condition']],
             $stub);
     }
 }

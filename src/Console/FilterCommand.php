@@ -5,9 +5,9 @@ namespace AppsLab\LaravelEasySearch\Console;
 
 
 use AppsLab\LaravelEasySearch\Contracts\GeneratorCommand;
+use AppsLab\LaravelEasySearch\Exceptions\QueryBuildError;
 use AppsLab\LaravelEasySearch\Facades\Search;
-use AppsLab\LaravelEasySearch\Repositories\DatabaseRepository;
-use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Str;
 
 class FilterCommand extends GeneratorCommand
@@ -16,33 +16,36 @@ class FilterCommand extends GeneratorCommand
      * Add filter for searching model
      * @var string
      */
-    protected $signature = 'make:filter {columns* : columns name or all} {--c|condition=} {--e|exclude= : Columns which should be excluded}';
+    protected $signature = 'make:filter {columns* : columns name or all} {--t|table=} {--e|exclude= : Columns which should be excluded} {--force}';
+    protected $table;
 
     protected $description = "This command is used to create search filters";
 
     public function handle()
     {
-        $name = $this->qualifyClass("Demoss");
-        $path =  $this->getPath($name);
-        $this->makeDirectory($path);
-        $this->files->put($path, $this->buildClass($name));
-
-        dd($this->laravel['path'], $this->rootNamespace(), $this->makeDirectory($path));
-
         if (Search::configNotPublished()){
-            return $this->warn('Publish laravel easy search config file');
+            Artisan::call('vendor:publish',[
+                '--provider' => "AppsLab\LaravelEasySearch\LaravelEasySearchBaseServiceProvider"
+            ]);
+
+            $this->info($this->files->get(__DIR__.'/../../resources/stubs/hello.stub'));
         }
-        $getUserTableName = $this->ask("Table: Enter the table you want to create filter for");
-        $getUserTableName = ctype_upper($getUserTableName) ? strtolower($getUserTableName) : $getUserTableName;
 
-        $tableName = Str::snake(Str::camel($getUserTableName));
+        $getTableName = $this->option("table");
 
-        if (DatabaseRepository::conn($tableName)->tableExists()){
+        $getTableName = $getTableName ? str_replace("=","", $getTableName) : null;
+
+        if (! $getTableName){
+            $getTableName = $this->ask("Enter table name:");
+        }
+
+        $getUserTableName = ctype_upper($getTableName) ? strtolower($getTableName) : $getTableName;
+
+        $this->table = Str::snake(Str::camel($getUserTableName));
+        $dbRepo = Search::table($this->table);
+
+        if ($dbRepo->tableExists()){
             $getEnteredColumns = $this->argument('columns');
-            $getDefaultCondition = $this->option("condition");
-            $getDefaultCondition = trim($getDefaultCondition == "==" ? "=" : str_replace("=","", $getDefaultCondition));
-
-            $dbRepo = DatabaseRepository::conn($tableName);
 
             if (in_array("all", $getEnteredColumns)){
                 $getEnteredColumns = $dbRepo->getTableColumns();
@@ -52,34 +55,60 @@ class FilterCommand extends GeneratorCommand
             $exclude = $exclude ? explode(",",trim(str_replace("=","",$exclude))) : [];
 
             $getValidTableColumns = $dbRepo->validateTableColumns($dbRepo->excludeColumns($getEnteredColumns, $exclude));
+            $autogenerate = true;
 
-            if (count($getValidTableColumns) > 1){
-                $builderOption = $this->choice("Add query to filter one-by-one or autogenerate?",["OneByOne","Autogenerate"],"Autogenerate");
-
-                if ($builderOption == "OneByOne") {
-                    $this->getFilters($getValidTableColumns);
-                }
-
-                if ($builderOption == "Autogenerate") {
-                    $this->getFilters($getValidTableColumns);
-                }
+            if (! $this->confirm("Autogenerate query?")) {
+                $autogenerate = false;
             }
 
-            $queryType = $this->anticipate("Enter <fg=white>". implode($getValidTableColumns) ."</> query type without/with query condition eg <fg=white>where</> or <fg=white>whereDate|!=</>. Press Enter to accept default",["where|="],"where|Like");
+            $columnsWithQuery = $this->getFilters($getValidTableColumns, $autogenerate);
+
+            $getTableBar = $this->output->createProgressBar(count($columnsWithQuery));
+            $getTableBar->start();
+
+            $filtersGenerated = [];
+
+            foreach ($columnsWithQuery as $key => $columnData){
+                $name = $this->qualifyClass(Str::studly($this->table.'_'.$key));
+                $force = $this->option('force');
+
+                if (! $force && file_exists(filter_path($name.".php"))){
+                    continue;
+                }
+
+                $data = [
+                    'name' => $name,
+                    'column' => $key,
+                    'condition' => $columnData['condition'],
+                    'query' => $columnData['query']
+                ];
+
+                $path =  $this->getPath($name);
+
+                $this->makeDirectory($path);
+                $this->files->put($path, $this->buildClass($data));
+
+                array_push($filtersGenerated,[
+                    $name, $columnData['query'], ($columnData['condition'] == "" ? "=" : $columnData['condition'])
+                ]);
+
+                $getTableBar->advance();
+            }
+            $getTableBar->finish();
+            $this->line("\n");
+            $this->table(['Filter', 'QueryType', 'Condition'], $filtersGenerated);
+            $this->line("You can change your query on specific Filter in dir ". config('easy-search.location.filter'));
+            $this->info("All good, filters build successfully Go search 🍻");
+            return ;
 
         }
+
+        $this->error("The table {$this->table} does not exist in the app database");
     }
 
     protected function qualifyClass($name)
     {
         return $name;
-//        $name = ltrim($name, '\\/');
-//        $rootNamespace =  config('easy-search.namespace.filter');
-//        if (Str::startsWith($name, $rootNamespace)){
-//            return $name;
-//        }
-//        $name = str_replace("/","\\", $name);
-//        return dd($this->qualifyClass($this->getDefaultNamespace(trim($rootNamespace, '\\')).'\\'.$name));
     }
 
     protected function getStub()
@@ -89,10 +118,30 @@ class FilterCommand extends GeneratorCommand
 
     public function getFilters($tableColumns, $autogenerate = false): array
     {
+        $columnsWithQuery = null;
+
         foreach ($tableColumns as $tableColumn){
-            $this->anticipate("Enter <fg=white>{$tableColumn}</> query type without/with query condition eg 
-            <fg=white>where</> or <fg=white>whereDate|!=</>. Press Enter to accept default",["where|="],"where|Like");
+            $autogenerateQuery = Search::autogenerateQuery($this->table, $tableColumn);
+
+            if (! array_key_exists('condition', $autogenerateQuery) && ! array_key_exists('query', $autogenerateQuery)){
+                throw new QueryBuildError("Query builder response does not have condition or query arguments");
+            }
+            $defaultQuery = $autogenerateQuery['query'] . ($autogenerateQuery['condition'] != '' ? '|'.$autogenerateQuery['condition'] : '');
+
+            $userQuery = $autogenerate ? $defaultQuery : $this->anticipate("Enter <fg=white>{$tableColumn}</> query and condition(optional) seperated by | eg <fg=white>where</> or <fg=white>whereDate|!=</>",config('easy-search.queries'),$defaultQuery);
+
+            $formartQuery = explode("|", $userQuery);
+
+            if (array_key_exists(0, $formartQuery)){
+                $query['query'] = trim($formartQuery[0]) == "" ? "where" : trim($formartQuery[0]);
+            }
+
+            $query['condition'] = array_key_exists(1, $formartQuery) ? trim($formartQuery[1]) : "";
+
+            $columnsWithQuery[$tableColumn] = $query;
         }
+
+        return $columnsWithQuery;
     }
 
     protected function getNamespace($name)

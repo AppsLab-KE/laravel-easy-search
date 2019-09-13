@@ -1,0 +1,25 @@
+<?php
+namespace App\Providers;
+
+use AppsLab\LaravelEasySearch\Facades\Search;
+use Illuminate\Support\ServiceProvider;
+
+class BuildServiceProvider extends ServiceProvider
+{
+    public function boot()
+    {
+        Search::builds($this->regiterBuilds());
+    }
+
+    public function register()
+    {
+        
+    }
+
+    private function regiterBuilds()
+    {
+        return [
+
+        ];
+    }
+}

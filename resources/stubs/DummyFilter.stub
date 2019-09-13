@@ -11,12 +11,12 @@ namespace DummyNamespace;
 
 use AppsLab\LaravelEasySearch\Contracts\FilterInterface;
 use Illuminate\Database\Eloquent\Builder;
-DummyCarbon
+//DummyImports
 
 class DummyClass implements FilterInterface
 {
     public static function apply(Builder $builder, $value)
     {
-        return $builder->where('id',$value);
+        return $builder->DummyQuery('DummyColumn'DummyCondition,$value);
     }
 }
