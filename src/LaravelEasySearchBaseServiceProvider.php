@@ -15,7 +15,7 @@ class LaravelEasySearchBaseServiceProvider extends ServiceProvider
 {
     public function boot()
     {
-        if ($this->app->runningInConsole()){
+        if ($this->app->runningInConsole()) {
             $this->registerPublishing();
         }
         $this->registerResources();
@@ -31,10 +31,10 @@ class LaravelEasySearchBaseServiceProvider extends ServiceProvider
     private function registerResources()
     {
         $file = __DIR__.'/../src/Support/helper.php';
-        if (file_exists($file)){
+        if (file_exists($file)) {
             require_once($file);
         }
-        $this->loadMigrationsFrom(__DIR__ . '/../database/migrations/');
+        // $this->loadMigrationsFrom(__DIR__ . '/../database/migrations/');
         $this->registerFacades();
         $this->registerBuilds();
     }
@@ -52,7 +52,7 @@ class LaravelEasySearchBaseServiceProvider extends ServiceProvider
 
     protected function registerFacades()
     {
-        $this->app->singleton('Search', function ($app){
+        $this->app->singleton('Search', function ($app) {
             return new \AppsLab\LaravelEasySearch\Search();
         });
     }
