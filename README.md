@@ -1,2 +1,2 @@
-# Laravel-Easy-Search
+# Documentation coming soon
 Laravel Easy Search
