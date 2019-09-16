@@ -3,7 +3,6 @@
 
 namespace AppsLab\LaravelEasySearch\Tests;
 
-
 use AppsLab\LaravelEasySearch\LaravelEasySearchBaseServiceProvider;
 
 class TestCase extends \Orchestra\Testbench\TestCase

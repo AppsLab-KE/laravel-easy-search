@@ -3,7 +3,6 @@
 
 namespace AppsLab\LaravelEasySearch\Repositories;
 
-
 use Illuminate\Support\Facades\Schema;
 
 class DatabaseRepository
@@ -40,8 +39,8 @@ class DatabaseRepository
     {
         $tableColumns = $this->getTableColumns();
 
-        $filtered = array_filter($filterColumns, function ($column) use ($tableColumns){
-            return in_array($column, $tableColumns);
+        $filtered = array_filter($filterColumns, function ($column) use ($tableColumns) {
+            return in_array(strtolower($column), $tableColumns);
         });
 
         return $filtered;
@@ -56,8 +55,8 @@ class DatabaseRepository
      */
     public function excludeColumns(array $columns, array $excludeColumns)
     {
-        $filtered = array_filter($columns, function ($column) use ($excludeColumns){
-            return ! in_array($column, $excludeColumns);
+        $filtered = array_filter($columns, function ($column) use ($excludeColumns) {
+            return !in_array($column, $excludeColumns);
         });
 
         return $filtered;

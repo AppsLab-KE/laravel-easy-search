@@ -3,6 +3,7 @@
 
 namespace AppsLab\LaravelEasySearch\Repositories;
 
+use AppsLab\LaravelEasySearch\Facades\Search;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 
@@ -11,8 +12,15 @@ class ModelRepository
     public $model;
     public $modelQuery;
     protected $allowedColumns = null;
-    protected $sortBy;
+    protected $sortBy = null;
+    protected $universalColumns = [];
     public $request;
+    public $allowPaginate = false;
+    public $ignoredFilters = ['page'];
+    protected $perPage = 10;
+    public $universalSearchKey = 'search';
+    public $allowUniversalSearch = false;
+    //    public $search
 
     public function __construct(Model $model)
     {
@@ -25,22 +33,32 @@ class ModelRepository
      * @param array $replaceFilters
      * @return void
      */
-    public function applyFilters(array $replaceFilters = null)
+    public function applyFilters(array $replaceFilters = [])
     {
         $this->request = \request();
         $getQueryFilters = $this->request->all();
 
-
-
-        if ($replaceFilters) {
-            foreach ($replaceFilters as $key => $replacement) {
-                if (is_array($replacement)) {
-                    foreach ($replacement as $innerKey => $innerReplaceFilters) {
-                        $getQueryFilters = $this->replaceKeys($innerKey, $innerReplaceFilters, $getQueryFilters);
-                    }
-                } else {
-                    $getQueryFilters = $this->replaceKeys($key, $replacement, $getQueryFilters);
+        foreach ($replaceFilters as $key => $replacement) {
+            if (is_array($replacement)) {
+                foreach ($replacement as $innerKey => $innerReplaceFilters) {
+                    $getQueryFilters = $this->replaceKeys($innerKey, $innerReplaceFilters, $getQueryFilters);
                 }
+            } else {
+                $getQueryFilters = $this->replaceKeys($key, $replacement, $getQueryFilters);
+            }
+        }
+
+        if ($this->allowUniversalSearch && array_key_exists($this->universalSearchKey, $getQueryFilters)) {
+            foreach ($this->universalColumns as $key) {
+                $getQueryFilters[$key] = $getQueryFilters[$this->universalSearchKey];
+            }
+
+            unset($getQueryFilters[$this->universalSearchKey]);
+        }
+
+        foreach ($getQueryFilters as $key => $getQueryFilter) {
+            if (in_array($key, $this->ignoredFilters())) {
+                unset($getQueryFilters[$key]);
             }
         }
 
@@ -67,6 +85,21 @@ class ModelRepository
         return $getQueryFilters;
     }
 
+    public function applyUniversalSearch(string $parameter = null)
+    {
+        $this->allowUniversalSearch = true;
+        $this->universalSearchKey = $parameter ? $parameter : $this->universalSearchKey;
+
+        $this->universalColumns = DatabaseRepository::conn($this->model->getTable())->getTableColumns();
+        $allowedColumns = $this->allowedColumns ? $this->allowedColumns : [];
+
+        $this->universalColumns = array_filter($allowedColumns, function ($column) use ($allowedColumns) {
+            return in_array($column, $allowedColumns);
+        });
+
+        return $this;
+    }
+
     /**
      * Get sortBy parameters and map them to @sortBy
      *
@@ -81,6 +114,11 @@ class ModelRepository
         return $this;
     }
 
+    private function applySortBy($query)
+    {
+        return $this->sortBy ? $query->orderBy(...$this->sortBy) : $query;
+    }
+
     /**
      * The columns allowed to be returned from the table.
      *
@@ -90,6 +128,10 @@ class ModelRepository
     public function allowedColumns(array $columns)
     {
         $this->allowedColumns = $columns;
+
+        if ($this->allowUniversalSearch) {
+            $this->applyUniversalSearch();
+        }
 
         return $this;
     }
@@ -101,11 +143,18 @@ class ModelRepository
      */
     public function get()
     {
-        if ($this->allowedColumns) {
-            return $this->modelQuery->get($this->allowedColumns);
+        return $this->allowedColumns($this->modelQuery);
+    }
+
+    private function applyAllowedColumns($query)
+    {
+        $query = $this->applySortBy($query);
+
+        if ($this->allowPaginate) {
+            return $this->allowedColumns ? $query->paginate($this->perPage, $this->allowedColumns) : $query->paginate($this->perPage);
         }
 
-        return $this->modelQuery->get();
+        return $this->allowedColumns ? $query->get($this->allowedColumns) : $query->get();
     }
 
     /**
@@ -116,10 +165,14 @@ class ModelRepository
      */
     public function paginate($perPage)
     {
-        if ($this->allowedColumns) {
-            return $this->modelQuery->paginate($perPage, $this->allowedColumns);
-        }
+        $this->perPage = $perPage;
+        $this->allowPaginate = true;
 
-        return $this->modelQuery->paginate($perPage);
+        return $this->applyAllowedColumns($this->modelQuery);
+    }
+
+    private function ignoredFilters()
+    {
+        return $this->ignoredFilters;
     }
 }

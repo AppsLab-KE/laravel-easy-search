@@ -61,6 +61,11 @@ class FilterCommand extends GeneratorCommand
                 $autogenerate = false;
             }
 
+            if (count($getValidTableColumns) < 1){
+            $this->error("Column not found in the table. Columns are case sensitive");
+            return;
+            }
+
             $columnsWithQuery = $this->getFilters($getValidTableColumns, $autogenerate);
 
             $getTableBar = $this->output->createProgressBar(count($columnsWithQuery));
@@ -121,6 +126,7 @@ class FilterCommand extends GeneratorCommand
         $columnsWithQuery = null;
 
         foreach ($tableColumns as $tableColumn){
+            $tableColumn = strtolower($tableColumn);
             $autogenerateQuery = Search::autogenerateQuery($this->table, $tableColumn);
 
             if (! array_key_exists('condition', $autogenerateQuery) && ! array_key_exists('query', $autogenerateQuery)){
