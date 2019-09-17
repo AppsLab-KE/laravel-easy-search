@@ -1,2 +1,3 @@
 # Documentation coming soon
-Laravel Easy Search
+
+Work under progress 🚧
