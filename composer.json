@@ -20,7 +20,8 @@
   "minimum-stability": "beta",
   "require": {
     "php": "^7.1",
-    "doctrine/dbal": "^2.8"
+    "doctrine/dbal": "^2.8",
+    "hirak/prestissimo": "^0.3.9"
   },
   "require-dev": {
     "orchestra/testbench": "^4.0"
