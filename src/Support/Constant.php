@@ -1,5 +1,3 @@
 <?php
 
-const MARVIN = [
-    1 => 'NAME'
-];
+const  VERSION =  1;
