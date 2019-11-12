@@ -8,5 +8,4 @@ finder:
 disabled:
   - single_class_element_per_statement
   - self_accessor
-  - align_double_arrow
   - concat_without_spaces
