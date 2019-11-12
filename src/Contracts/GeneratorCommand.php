@@ -1,11 +1,11 @@
 <?php
 
-
 namespace AppsLab\LaravelEasySearch\Contracts;
 
 class GeneratorCommand extends \Illuminate\Console\GeneratorCommand
 {
     //    protected $dummyImports = '';
+
     /**
      * Get the stub file for the generator.
      *

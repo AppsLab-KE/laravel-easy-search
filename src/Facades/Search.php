@@ -1,8 +1,6 @@
 <?php
 
-
 namespace AppsLab\LaravelEasySearch\Facades;
-
 
 use Illuminate\Support\Facades\Facade;
 

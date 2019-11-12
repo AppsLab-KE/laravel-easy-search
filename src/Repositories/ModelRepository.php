@@ -1,11 +1,9 @@
 <?php
 
-
 namespace AppsLab\LaravelEasySearch\Repositories;
 
 use AppsLab\LaravelEasySearch\Facades\Search;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Http\Request;
 
 class ModelRepository
 {
@@ -28,7 +26,7 @@ class ModelRepository
     }
 
     /**
-     * Apply filter to model
+     * Apply filter to model.
      *
      * @param array $replaceFilters
      * @return void
@@ -68,7 +66,7 @@ class ModelRepository
     }
 
     /**
-     * Replace table search parameters with filters
+     * Replace table search parameters with filters.
      *
      * @param [type] $key
      * @param [type] $replacement
@@ -101,7 +99,7 @@ class ModelRepository
     }
 
     /**
-     * Get sortBy parameters and map them to @sortBy
+     * Get sortBy parameters and map them to @sortBy.
      *
      * @param [type] $field
      * @param string $type
@@ -137,7 +135,7 @@ class ModelRepository
     }
 
     /**
-     * Get method from model
+     * Get method from model.
      *
      * @return void
      */
@@ -158,7 +156,7 @@ class ModelRepository
     }
 
     /**
-     * Paginate method from model
+     * Paginate method from model.
      *
      * @param [type] $perPage
      * @return void
@@ -174,6 +172,7 @@ class ModelRepository
     public function addQuery($queryType, $queryParameters)
     {
         $this->modelQuery = $this->modelQuery->{$queryType}(...$queryParameters);
+
         return $this;
     }
 

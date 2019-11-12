@@ -1,12 +1,9 @@
 <?php
 
-
 namespace AppsLab\LaravelEasySearch;
-
 
 use AppsLab\LaravelEasySearch\Builds\DateBuild;
 use AppsLab\LaravelEasySearch\Builds\GeneralBuild;
-use AppsLab\LaravelEasySearch\Builds\Integer;
 use AppsLab\LaravelEasySearch\Builds\IntegerBuild;
 use AppsLab\LaravelEasySearch\Console\FilterCommand;
 use Illuminate\Support\ServiceProvider;
@@ -24,7 +21,7 @@ class LaravelEasySearchBaseServiceProvider extends ServiceProvider
     public function register()
     {
         $this->commands([
-            FilterCommand::class
+            FilterCommand::class,
         ]);
     }
 
@@ -32,9 +29,9 @@ class LaravelEasySearchBaseServiceProvider extends ServiceProvider
     {
         $file = __DIR__.'/../src/Support/helper.php';
         if (file_exists($file)) {
-            require_once($file);
+            require_once $file;
         }
-        
+
         $this->registerFacades();
         $this->registerBuilds();
     }
@@ -42,12 +39,12 @@ class LaravelEasySearchBaseServiceProvider extends ServiceProvider
     protected function registerPublishing()
     {
         $this->publishes([
-            __DIR__.'/../config/easy-search.php' => 'config/easy-search.php'
-        ],'easy-search-config');
+            __DIR__.'/../config/easy-search.php' => 'config/easy-search.php',
+        ], 'easy-search-config');
 
         $this->publishes([
-            __DIR__.'/../resources/stubs/BuildServiceProvider.stub' => app_path('Providers/BuildServiceProvider.php')
-        ],'easy-search-provider');
+            __DIR__.'/../resources/stubs/BuildServiceProvider.stub' => app_path('Providers/BuildServiceProvider.php'),
+        ], 'easy-search-provider');
     }
 
     protected function registerFacades()
@@ -62,7 +59,7 @@ class LaravelEasySearchBaseServiceProvider extends ServiceProvider
         \AppsLab\LaravelEasySearch\Facades\Search::builds([
             GeneralBuild::class,
             IntegerBuild::class,
-            DateBuild::class
+            DateBuild::class,
         ]);
     }
 }
