@@ -171,6 +171,12 @@ class ModelRepository
         return $this->applyAllowedColumns($this->modelQuery);
     }
 
+    public function addQuery($queryType, $queryParameters)
+    {
+        $this->modelQuery = $this->modelQuery->{$queryType}(...$queryParameters);
+        return $this;
+    }
+
     private function ignoredFilters()
     {
         return $this->ignoredFilters;

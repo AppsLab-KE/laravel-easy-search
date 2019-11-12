@@ -34,7 +34,7 @@ class LaravelEasySearchBaseServiceProvider extends ServiceProvider
         if (file_exists($file)) {
             require_once($file);
         }
-        // $this->loadMigrationsFrom(__DIR__ . '/../database/migrations/');
+        
         $this->registerFacades();
         $this->registerBuilds();
     }
