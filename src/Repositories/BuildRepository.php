@@ -1,8 +1,6 @@
 <?php
 
-
 namespace AppsLab\LaravelEasySearch\Repositories;
-
 
 use AppsLab\LaravelEasySearch\Builds\GeneralBuild;
 use AppsLab\LaravelEasySearch\ClassDoesNotExist;
@@ -16,11 +14,11 @@ class BuildRepository
         return new BuildRepository();
     }
 
-    public function query($buildClassName = "GeneralBuild", $condition = null, $queryType = null)
+    public function query($buildClassName = 'GeneralBuild', $condition = null, $queryType = null)
     {
         $class = $this->getBuild($buildClassName);
 
-        if ( ! class_exists($class) && ! method_exists($class, "buildQuery")) {
+        if (! class_exists($class) && ! method_exists($class, 'buildQuery')) {
             return GeneralBuild::buildQuery($condition, $queryType);
 //            throw new ClassDoesNotExist("{$class} does not exist check again");
         }
@@ -30,11 +28,11 @@ class BuildRepository
 
     private function getBuild($build)
     {
-        if (! class_exists($build)){
-            foreach (Search::availableBuilds() as $availableBuild){
+        if (! class_exists($build)) {
+            foreach (Search::availableBuilds() as $availableBuild) {
                 $class = new ReflectionClass($availableBuild);
 
-                if ($class->getShortName() == $build){
+                if ($class->getShortName() == $build) {
                     return $class->getName();
                 }
             }
@@ -45,12 +43,12 @@ class BuildRepository
 
     public function classNameFromColumnType($tableColumnType): string
     {
-        foreach (config('easy-search.autogenerate-query-builds') as $key => $value){
-            if (strpos( strtolower($tableColumnType), $key)){
+        foreach (config('easy-search.autogenerate-query-builds') as $key => $value) {
+            if (strpos(strtolower($tableColumnType), $key)) {
                 return $value;
             }
         }
 
-        return "GeneralBuild";
+        return 'GeneralBuild';
     }
 }

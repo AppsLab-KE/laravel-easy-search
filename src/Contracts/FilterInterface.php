@@ -1,8 +1,6 @@
 <?php
 
-
 namespace AppsLab\LaravelEasySearch\Contracts;
-
 
 use Illuminate\Database\Eloquent\Builder;
 

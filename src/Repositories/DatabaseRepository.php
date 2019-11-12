@@ -1,6 +1,5 @@
 <?php
 
-
 namespace AppsLab\LaravelEasySearch\Repositories;
 
 use Illuminate\Support\Facades\Schema;
@@ -20,7 +19,7 @@ class DatabaseRepository
     }
 
     /**
-     * Check if table exists
+     * Check if table exists.
      *
      * @param string $tableName
      * @return bool
@@ -31,7 +30,7 @@ class DatabaseRepository
     }
 
     /**
-     * Validate user columns against table columns
+     * Validate user columns against table columns.
      * @param $filterColumns
      * @return array
      */
@@ -47,7 +46,7 @@ class DatabaseRepository
     }
 
     /**
-     * Remove excluded columns
+     * Remove excluded columns.
      *
      * @param array $columns
      * @param array $excludeColumns
@@ -56,14 +55,14 @@ class DatabaseRepository
     public function excludeColumns(array $columns, array $excludeColumns)
     {
         $filtered = array_filter($columns, function ($column) use ($excludeColumns) {
-            return !in_array($column, $excludeColumns);
+            return ! in_array($column, $excludeColumns);
         });
 
         return $filtered;
     }
 
     /**
-     * Exclude columns and return the required columns
+     * Exclude columns and return the required columns.
      *
      * @param array $excludedColumns
      * @return array
@@ -74,7 +73,7 @@ class DatabaseRepository
     }
 
     /**
-     * Return column type name
+     * Return column type name.
      *
      * @param $columnName
      * @return string
