@@ -17,7 +17,7 @@ return [
         "decimal" => "IntegerBuild",
         "date" => "DateBuild",
         "boolean" => "IntegerBuild",
-        "string" => "TextBuild",
+        "string" => "StringBuild",
         "text" => "TextBuild",
     ],
     'queries' => [
