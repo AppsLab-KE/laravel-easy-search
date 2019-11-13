@@ -17,6 +17,6 @@ class DummyClass implements FilterInterface
 {
     public static function apply(Builder $builder, $value)
     {
-        return $builder->DummyQuery('DummyColumn'DummyCondition, $value);
+        return $builder->DummyQuery('DummyColumn'DummyCondition, DummyValue);
     }
 }
