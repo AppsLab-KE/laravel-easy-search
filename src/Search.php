@@ -17,7 +17,14 @@ class Search
         return is_null(config('easy-search'));
     }
 
-    public function model($model)
+    /**
+     * Model to be searched
+     *
+     * @param $model
+     * @return ModelRepository
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
+     */
+    public function model($model): ModelRepository
     {
         return new ModelRepository(app()->make($model));
     }
@@ -45,26 +52,33 @@ class Search
     public function autogenerateQuery($tableName, string $columnName): array
     {
         $getColumnType = $this->table($tableName)->getColumnType($columnName);
+        dd($getColumnType);
         $className = $this->build()->classNameFromColumnType($getColumnType);
 
         return $this->build()->query($className);
     }
 
+
+
+    /**
+     * Get model filter
+     * @param string $filterName
+     * @param null $namespace
+     * @return string|null
+     * @throws ClassDoesNotExist
+     */
     public function getFilter(string $filterName, $namespace = null)
     {
         $filterName = Str::studly($filterName);
-        //TODO: class does not exist check
-        $filterNamespace = filter_class($filterName, $namespace);
+        $filterClass = filter_class($filterName, $namespace);
 
-        if (! $this->isValidFilter($filterName)) {
-            throw new ClassDoesNotExist('Class does not exist');
+        if (! class_exists($filterClass)) {
+            if (env('APP_ENV') != 'local'){
+                return null;
+            }
+            throw new ClassDoesNotExist("Filter class {$filterClass}.php does not exist, run php artisan make:filter columnname");
         }
 
-        return $filterNamespace;
-    }
-
-    public function isValidFilter($filterClassName) : bool
-    {
-        return file_exists(filter_path($filterClassName.'.php'));
+        return $filterClass;
     }
 }

@@ -11,18 +11,17 @@ class ModelRepository
     public $modelQuery;
     protected $allowedColumns = null;
     protected $sortBy = null;
-    protected $universalColumns = [];
     public $request;
     public $allowPaginate = false;
     public $ignoredFilters = ['page'];
     protected $perPage = 10;
     public $universalSearchKey = 'search';
     public $allowUniversalSearch = false;
-    //    public $search
 
     public function __construct(Model $model)
     {
         $this->model = $model;
+        $this->modelQuery = $model->newQuery();
     }
 
     /**
@@ -31,11 +30,39 @@ class ModelRepository
      * @param array $replaceFilters
      * @return void
      */
-    public function applyFilters(array $replaceFilters = [])
+    public function applyFilters(array $replaceFilters = []): ModelRepository
     {
         $this->request = \request();
-        $getQueryFilters = $this->request->all();
+        $getQueryFilters = $this->formatFilters($replaceFilters, $this->request->all());
 
+        if ($this->allowUniversalSearch && array_key_exists($this->universalSearchKey, $getQueryFilters)) {
+            foreach ($this->allowedColumns as $key) {
+                $getQueryFilters[$key] = $getQueryFilters[$this->universalSearchKey];
+            }
+
+            unset($getQueryFilters[$this->universalSearchKey]);
+        }
+
+        $getQueryFilters = $this->removeIgnoredFilters($getQueryFilters);
+
+        $this->modelQuery = count($getQueryFilters) > 0 ? $this->model->apply($getQueryFilters) : $this->model->newQuery();
+
+        return $this;
+    }
+
+    private function removeIgnoredFilters($getQueryFilters): array
+    {
+        foreach ($getQueryFilters as $key => $getQueryFilter) {
+            if (in_array($key, $this->ignoredFilters())) {
+                unset($getQueryFilters[$key]);
+            }
+        }
+
+        return $getQueryFilters;
+    }
+
+    private function formatFilters($replaceFilters, $getQueryFilters): array
+    {
         foreach ($replaceFilters as $key => $replacement) {
             if (is_array($replacement)) {
                 foreach ($replacement as $innerKey => $innerReplaceFilters) {
@@ -46,23 +73,7 @@ class ModelRepository
             }
         }
 
-        if ($this->allowUniversalSearch && array_key_exists($this->universalSearchKey, $getQueryFilters)) {
-            foreach ($this->universalColumns as $key) {
-                $getQueryFilters[$key] = $getQueryFilters[$this->universalSearchKey];
-            }
-
-            unset($getQueryFilters[$this->universalSearchKey]);
-        }
-
-        foreach ($getQueryFilters as $key => $getQueryFilter) {
-            if (in_array($key, $this->ignoredFilters())) {
-                unset($getQueryFilters[$key]);
-            }
-        }
-
-        $this->modelQuery = count($getQueryFilters) > 0 ? $this->model->apply($getQueryFilters) : $this->model->newQuery();
-
-        return $this;
+        return $getQueryFilters;
     }
 
     /**
@@ -83,17 +94,20 @@ class ModelRepository
         return $getQueryFilters;
     }
 
-    public function applyUniversalSearch(string $parameter = null)
+    /**
+     * Apply search in all the available filter
+     *
+     * @param string|null $parameter search filter
+     * @return $this
+     */
+    public function applyGlobalSearch(string $parameter = null)
     {
         $this->allowUniversalSearch = true;
-        $this->universalSearchKey = $parameter ? $parameter : $this->universalSearchKey;
+        $this->universalSearchKey = $parameter ?? $this->universalSearchKey;
 
-        $this->universalColumns = DatabaseRepository::conn($this->model->getTable())->getTableColumns();
-        $allowedColumns = $this->allowedColumns ? $this->allowedColumns : [];
+        $this->allowedColumns = DatabaseRepository::conn($this->model->getTable())->getTableColumns();
 
-        $this->universalColumns = array_filter($allowedColumns, function ($column) use ($allowedColumns) {
-            return in_array($column, $allowedColumns);
-        });
+        $this->applyFilters();
 
         return $this;
     }
@@ -105,7 +119,7 @@ class ModelRepository
      * @param string $type
      * @return void
      */
-    public function sortBy($field, $type = 'ASC')
+    public function sortBy($field, $type = 'ASC'): ModelRepository
     {
         $this->sortBy = [$field, $type];
 
@@ -123,12 +137,12 @@ class ModelRepository
      * @param array $columns
      * @return void
      */
-    public function allowedColumns(array $columns)
+    public function allowedColumns(array $columns): self
     {
         $this->allowedColumns = $columns;
 
         if ($this->allowUniversalSearch) {
-            $this->applyUniversalSearch();
+            $this->applyGlobalSearch();
         }
 
         return $this;
@@ -141,9 +155,30 @@ class ModelRepository
      */
     public function get()
     {
-        return $this->allowedColumns($this->modelQuery);
+        return $this->applyAllowedColumns($this->modelQuery);
     }
 
+    public function addRelation($relation)
+    {
+        $this->modelQuery = $this->modelQuery->with($relation);
+        return $this;
+    }
+
+    /**
+     * Return the first item
+     *
+     */
+    public function first()
+    {
+        return $this->applyAllowedColumns($this->modelQuery)->first();
+    }
+
+    /**
+     * Filter the allowed columns from he search
+     *
+     * @param $query
+     * @return mixed
+     */
     private function applyAllowedColumns($query)
     {
         $query = $this->applySortBy($query);
@@ -153,6 +188,11 @@ class ModelRepository
         }
 
         return $this->allowedColumns ? $query->get($this->allowedColumns) : $query->get();
+    }
+
+    public function applySearch(array $filters)
+    {
+        dd($filters);
     }
 
     /**
@@ -169,7 +209,7 @@ class ModelRepository
         return $this->applyAllowedColumns($this->modelQuery);
     }
 
-    public function addQuery($queryType, $queryParameters)
+    public function buildQuery($queryType, $queryParameters)
     {
         $this->modelQuery = $this->modelQuery->{$queryType}(...$queryParameters);
 

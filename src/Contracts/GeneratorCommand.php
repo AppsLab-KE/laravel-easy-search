@@ -20,7 +20,7 @@ class GeneratorCommand extends \Illuminate\Console\GeneratorCommand
     {
         $stub = str_replace(
             ['DummyNamespace', 'DummyRootNamespace', 'NamespacedDummyUserModel'],
-            [$this->getNamespace($name), $this->rootNamespace(), $this->userProviderModel()],
+            [$this->getNamespace($name).'\\'.$name['folder'], $this->rootNamespace(), $this->userProviderModel()],
             $stub
         );
 
@@ -30,7 +30,8 @@ class GeneratorCommand extends \Illuminate\Console\GeneratorCommand
     protected function replaceClass($stub, $data)
     {
         $class = str_replace($this->getNamespace($data['name']) . '\\', '', $data['name']);
-        $data['condition'] = empty(trim(str_replace(' ', '', $data['condition']))) ? $data['condition'] : ",'" . $data['condition'] . "'";
+        $data['condition'] = empty(trim(str_replace(' ', '', $data['condition']))) ? $data['condition'] :
+            ",'" . $data['condition'] . "'";
 
         return str_replace(
             ['DummyClass', 'DummyQuery', 'DummyColumn', 'DummyCondition'],

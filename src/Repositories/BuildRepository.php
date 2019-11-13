@@ -20,7 +20,6 @@ class BuildRepository
 
         if (! class_exists($class) && ! method_exists($class, 'buildQuery')) {
             return GeneralBuild::buildQuery($condition, $queryType);
-//            throw new ClassDoesNotExist("{$class} does not exist check again");
         }
 
         return $class::buildQuery($condition, $queryType);

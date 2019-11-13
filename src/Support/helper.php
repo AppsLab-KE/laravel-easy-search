@@ -44,6 +44,7 @@ function is_filter_dir_available()
 
     return $filterPath;
 }
+
 function filter_namespace()
 {
     $filterPath = is_filter_dir_available();

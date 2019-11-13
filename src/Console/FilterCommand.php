@@ -73,7 +73,9 @@ class FilterCommand extends GeneratorCommand
             $filtersGenerated = [];
 
             foreach ($columnsWithQuery as $key => $columnData) {
-                $name = $this->qualifyClass(Str::studly($this->table.'_'.$key));
+                $folder = $this->table;
+                $fileName = Str::studly($key);
+                $name = $this->qualifyClass($folder.'/'.$fileName);
                 $force = $this->option('force');
 
                 if (! $force && file_exists(filter_path($name.'.php'))) {
@@ -81,8 +83,9 @@ class FilterCommand extends GeneratorCommand
                 }
 
                 $data = [
-                    'name' => $name,
+                    'name' => $fileName,
                     'column' => $key,
+                    'folder' => $folder,
                     'condition' => $columnData['condition'],
                     'query' => $columnData['query'],
                 ];
@@ -102,7 +105,7 @@ class FilterCommand extends GeneratorCommand
             $this->line("\n");
             $this->table(['Filter', 'QueryType', 'Condition'], $filtersGenerated);
             $this->line('You can change your query on specific Filter in dir '. config('easy-search.location.filter'));
-            $this->info('All good, filters build successfully Go search 🍻');
+            $this->info("\nAll good, filters build successfully \nGo search 🔎");
 
             return;
         }
@@ -133,12 +136,12 @@ class FilterCommand extends GeneratorCommand
             }
             $defaultQuery = $autogenerateQuery['query'] . ($autogenerateQuery['condition'] != '' ? '|'.$autogenerateQuery['condition'] : '');
 
-            $userQuery = $autogenerate ? $defaultQuery : $this->anticipate("Enter <fg=white>{$tableColumn}</> query and condition(optional) seperated by | eg <fg=white>where</> or <fg=white>whereDate|!=</>", config('easy-search.queries'), $defaultQuery);
+            $userQuery = $autogenerate ? $defaultQuery : $this->anticipate("Enter <fg=white>{$tableColumn}</> query and condition(optional) separated by | eg <fg=white>orWhere</> or <fg=white>whereDate|!=</>", config('easy-search.queries'), $defaultQuery);
 
             $formartQuery = explode('|', $userQuery);
 
             if (array_key_exists(0, $formartQuery)) {
-                $query['query'] = trim($formartQuery[0]) == '' ? 'where' : trim($formartQuery[0]);
+                $query['query'] = trim($formartQuery[0]) == '' ? 'orWhere' : trim($formartQuery[0]);
             }
 
             $query['condition'] = array_key_exists(1, $formartQuery) ? trim($formartQuery[1]) : '';
@@ -149,11 +152,21 @@ class FilterCommand extends GeneratorCommand
         return $columnsWithQuery;
     }
 
+    /**
+     * Return namespace
+     * @param string $name
+     * @return \Illuminate\Config\Repository|mixed|string
+     */
     protected function getNamespace($name)
     {
         return filter_namespace();
     }
 
+    /**
+     * Get file path
+     * @param string $name
+     * @return \Illuminate\Config\Repository|mixed|string
+     */
     protected function getPath($name)
     {
         return filter_path($name.'.php');
