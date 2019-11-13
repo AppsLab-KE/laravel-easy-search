@@ -6,6 +6,7 @@ use AppsLab\LaravelEasySearch\Contracts\GeneratorCommand;
 use AppsLab\LaravelEasySearch\Exceptions\QueryBuildError;
 use AppsLab\LaravelEasySearch\Facades\Search;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class FilterCommand extends GeneratorCommand
@@ -34,7 +35,9 @@ class FilterCommand extends GeneratorCommand
         $getTableName = $getTableName ? str_replace('=', '', $getTableName) : null;
 
         if (! $getTableName) {
-            $getTableName = $this->ask('Enter table name:');
+            $tables = DB::connection()->getDoctrineSchemaManager()->listTableNames();
+
+            $getTableName = $this->anticipate('Enter table name:', $tables);
         }
 
         $getUserTableName = ctype_upper($getTableName) ? strtolower($getTableName) : $getTableName;
@@ -66,6 +69,7 @@ class FilterCommand extends GeneratorCommand
             }
 
             $columnsWithQuery = $this->getFilters($getValidTableColumns, $autogenerate);
+            $folder = $this->table;
 
             $getTableBar = $this->output->createProgressBar(count($columnsWithQuery));
             $getTableBar->start();
@@ -73,7 +77,6 @@ class FilterCommand extends GeneratorCommand
             $filtersGenerated = [];
 
             foreach ($columnsWithQuery as $key => $columnData) {
-                $folder = $this->table;
                 $fileName = Str::studly($key);
                 $name = $this->qualifyClass($folder.'/'.$fileName);
                 $force = $this->option('force');
@@ -104,7 +107,7 @@ class FilterCommand extends GeneratorCommand
             $getTableBar->finish();
             $this->line("\n");
             $this->table(['Filter', 'QueryType', 'Condition'], $filtersGenerated);
-            $this->line('You can change your query on specific Filter in dir '. config('easy-search.location.filter'));
+            $this->line('You can change your query on specific Filter in dir '. config('easy-search.location.filter')."/".$folder);
             $this->info("\nAll good, filters build successfully \nGo search 🔎");
 
             return;
