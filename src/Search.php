@@ -49,16 +49,19 @@ class Search
         return DatabaseRepository::conn($tableName);
     }
 
+    /**
+     * Generate query parameters
+     * @param $tableName
+     * @param string $columnName
+     * @return array
+     */
     public function autogenerateQuery($tableName, string $columnName): array
     {
         $getColumnType = $this->table($tableName)->getColumnType($columnName);
-        dd($getColumnType);
         $className = $this->build()->classNameFromColumnType($getColumnType);
 
         return $this->build()->query($className);
     }
-
-
 
     /**
      * Get model filter
