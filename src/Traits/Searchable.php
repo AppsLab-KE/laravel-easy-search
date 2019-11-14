@@ -13,7 +13,7 @@ trait Searchable
         foreach ($searchItems as $filterName => $searchItem) {
             $filter = Search::getFilter($filterName, filter_namespace().'\\'.$this->getTable());
 
-            if (! $filter){
+            if (! $filter) {
                 continue;
             }
 

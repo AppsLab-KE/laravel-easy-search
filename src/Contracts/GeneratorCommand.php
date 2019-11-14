@@ -34,10 +34,10 @@ class GeneratorCommand extends \Illuminate\Console\GeneratorCommand
         $class = str_replace($this->getNamespace($data['name']) . '\\', '', $data['name']);
         $data['condition'] = empty(trim(str_replace(' ', '', $data['condition']))) ? $data['condition'] :
             ", '" . $data['condition'] . "'";
-        $value = Str::contains($data['condition'],'like') ? '"%".$value."%"' : '$value';
+        $value = Str::contains($data['condition'], 'like') ? '"%".$value."%"' : '$value';
 
         return str_replace(
-            ['DummyClass', 'DummyQuery', 'DummyColumn', 'DummyCondition','DummyValue'],
+            ['DummyClass', 'DummyQuery', 'DummyColumn', 'DummyCondition', 'DummyValue'],
             [$class, $data['query'], $data['column'], $data['condition'], $value],
             $stub
         );
