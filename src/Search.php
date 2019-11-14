@@ -29,6 +29,9 @@ class Search
         return new ModelRepository(app()->make($model));
     }
 
+    /**
+     * @param array $buildsg
+     */
     public function builds(array $builds)
     {
         $this->builds = array_merge($this->builds, $builds);
