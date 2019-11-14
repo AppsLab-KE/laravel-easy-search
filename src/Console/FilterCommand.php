@@ -107,7 +107,7 @@ class FilterCommand extends GeneratorCommand
             $getTableBar->finish();
             $this->line("\n");
             $this->table(['Filter', 'QueryType', 'Condition'], $filtersGenerated);
-            $this->line('You can change your query on specific Filter in dir '. config('easy-search.location.filter')."/".$folder);
+            $this->line('You can change your query on specific Filter in dir '. config('easy-search.location.filter').'/'.$folder);
             $this->info("\nAll good, filters build successfully \nGo search 🔎");
 
             return;
@@ -156,7 +156,7 @@ class FilterCommand extends GeneratorCommand
     }
 
     /**
-     * Return namespace
+     * Return namespace.
      * @param string $name
      * @return \Illuminate\Config\Repository|mixed|string
      */
@@ -166,7 +166,7 @@ class FilterCommand extends GeneratorCommand
     }
 
     /**
-     * Get file path
+     * Get file path.
      * @param string $name
      * @return \Illuminate\Config\Repository|mixed|string
      */

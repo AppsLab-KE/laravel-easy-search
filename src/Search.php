@@ -18,7 +18,7 @@ class Search
     }
 
     /**
-     * Model to be searched
+     * Model to be searched.
      *
      * @param $model
      * @return ModelRepository
@@ -53,7 +53,7 @@ class Search
     }
 
     /**
-     * Generate query parameters
+     * Generate query parameters.
      * @param $tableName
      * @param string $columnName
      * @return array
@@ -67,7 +67,7 @@ class Search
     }
 
     /**
-     * Get model filter
+     * Get model filter.
      * @param string $filterName
      * @param null $namespace
      * @return string|null
@@ -79,8 +79,8 @@ class Search
         $filterClass = filter_class($filterName, $namespace);
 
         if (! class_exists($filterClass)) {
-            if (env('APP_ENV') != 'local'){
-                return null;
+            if (env('APP_ENV') != 'local') {
+                return;
             }
             throw new ClassDoesNotExist("Filter class {$filterClass}.php does not exist, run php artisan make:filter columnname");
         }

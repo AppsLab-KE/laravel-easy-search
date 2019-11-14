@@ -54,6 +54,7 @@ class ModelRepository
         $getQueryFilters = $this->removeIgnoredFilters($getQueryFilters);
 
         $this->modelQuery = count($getQueryFilters) > 0 ? $this->model->apply($getQueryFilters) : $this->model->newQuery();
+
         return $this;
     }
 
@@ -112,7 +113,7 @@ class ModelRepository
         $this->allColumnsSearchKey = $parameter ?? $this->allColumnsSearchKey;
 
         $this->allColumnsFilters = array_filter(DatabaseRepository::conn($this->model->getTable())->getTableColumns(),
-            function ($column) use($ignoredColumns){
+            function ($column) use ($ignoredColumns) {
                 return ! in_array($column, $ignoredColumns);
             });
 
@@ -149,6 +150,7 @@ class ModelRepository
     public function allowedColumns(array $columns): self
     {
         $this->allowedColumns = $columns;
+
         return $this;
     }
 
@@ -164,13 +166,14 @@ class ModelRepository
 
     public function addRelation($relation)
     {
-        if (is_string($relation)){
+        if (is_string($relation)) {
             array_push($this->relations, $relation);
         }
 
-        if (is_array($relation)){
+        if (is_array($relation)) {
             $this->relations = array_merge($this->relations, $relation);
         }
+
         return $this;
     }
 
@@ -180,7 +183,7 @@ class ModelRepository
     }
 
     /**
-     * Filter the allowed columns from he search
+     * Filter the allowed columns from he search.
      *
      * @param $query
      * @return mixed

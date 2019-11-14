@@ -7,7 +7,6 @@ use AppsLab\LaravelEasySearch\Builds\GeneralBuild;
 use AppsLab\LaravelEasySearch\Builds\IntegerBuild;
 use AppsLab\LaravelEasySearch\Builds\TextBuild;
 use AppsLab\LaravelEasySearch\Console\FilterCommand;
-use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
 
 class LaravelEasySearchBaseServiceProvider extends ServiceProvider
@@ -62,7 +61,7 @@ class LaravelEasySearchBaseServiceProvider extends ServiceProvider
             GeneralBuild::class,
             IntegerBuild::class,
             DateBuild::class,
-            TextBuild::class
+            TextBuild::class,
         ]);
     }
 }

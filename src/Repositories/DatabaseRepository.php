@@ -54,8 +54,8 @@ class DatabaseRepository
      */
     public function excludeColumns(array $columns, array $excludeColumns)
     {
-        if (count($columns) < 2){
-            $columns = strpos($columns[0],',') ? explode(',',$columns[0]) : $columns;
+        if (count($columns) < 2) {
+            $columns = strpos($columns[0], ',') ? explode(',', $columns[0]) : $columns;
         }
         $filtered = array_filter($columns, function ($column) use ($excludeColumns) {
             return ! in_array($column, $excludeColumns);

@@ -3,7 +3,6 @@
 namespace AppsLab\LaravelEasySearch\Repositories;
 
 use AppsLab\LaravelEasySearch\Builds\GeneralBuild;
-use AppsLab\LaravelEasySearch\ClassDoesNotExist;
 use AppsLab\LaravelEasySearch\Facades\Search;
 use Illuminate\Support\Str;
 use ReflectionClass;
@@ -44,7 +43,7 @@ class BuildRepository
     public function classNameFromColumnType($tableColumnType): string
     {
         foreach (config('easy-search.autogenerate-query-builds') as $key => $value) {
-            if (Str::contains(strtolower($tableColumnType),$key)){
+            if (Str::contains(strtolower($tableColumnType), $key)) {
                 return $value;
             }
         }
