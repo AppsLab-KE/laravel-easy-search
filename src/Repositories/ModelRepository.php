@@ -15,8 +15,11 @@ class ModelRepository
     public $allowPaginate = false;
     public $ignoredFilters = ['page'];
     protected $perPage = 10;
-    public $universalSearchKey = 'search';
-    public $allowUniversalSearch = false;
+    public $allColumnsSearchKey = 'search';
+    public $allowAllColumnsSearch = false;
+    public $allColumnsFilters = [];
+    protected $relations = [];
+    protected $addedSearch = [];
 
     public function __construct(Model $model)
     {
@@ -33,20 +36,24 @@ class ModelRepository
     public function applyFilters(array $replaceFilters = []): ModelRepository
     {
         $this->request = \request();
-        $getQueryFilters = $this->formatFilters($replaceFilters, $this->request->all());
+        $getQueryFilters = array_merge($this->formatFilters($replaceFilters, $this->request->all()), $this->addedSearch);
 
-        if ($this->allowUniversalSearch && array_key_exists($this->universalSearchKey, $getQueryFilters)) {
-            foreach ($this->allowedColumns as $key) {
-                $getQueryFilters[$key] = $getQueryFilters[$this->universalSearchKey];
+        return $this->results($getQueryFilters);
+    }
+
+    private function results(array $getQueryFilters): ModelRepository
+    {
+        if ($this->allowAllColumnsSearch && array_key_exists($this->allColumnsSearchKey, $getQueryFilters)) {
+            foreach ($this->allColumnsFilters as $key) {
+                $getQueryFilters[$key] = $getQueryFilters[$this->allColumnsSearchKey];
             }
 
-            unset($getQueryFilters[$this->universalSearchKey]);
+            unset($getQueryFilters[$this->allColumnsSearchKey]);
         }
 
         $getQueryFilters = $this->removeIgnoredFilters($getQueryFilters);
 
         $this->modelQuery = count($getQueryFilters) > 0 ? $this->model->apply($getQueryFilters) : $this->model->newQuery();
-
         return $this;
     }
 
@@ -95,19 +102,21 @@ class ModelRepository
     }
 
     /**
-     * Apply search in all the available filter
-     *
-     * @param string|null $parameter search filter
+     * @param string|null $parameter
+     * @param array $ignoredColumns
      * @return $this
      */
-    public function applyGlobalSearch(string $parameter = null)
+    public function searchAllColumns(string $parameter = null, array $ignoredColumns = [])
     {
-        $this->allowUniversalSearch = true;
-        $this->universalSearchKey = $parameter ?? $this->universalSearchKey;
+        $this->allowAllColumnsSearch = true;
+        $this->allColumnsSearchKey = $parameter ?? $this->allColumnsSearchKey;
+
+        $this->allColumnsFilters = array_filter(DatabaseRepository::conn($this->model->getTable())->getTableColumns(),
+            function ($column) use($ignoredColumns){
+                return ! in_array($column, $ignoredColumns);
+            });
 
         $this->allowedColumns = DatabaseRepository::conn($this->model->getTable())->getTableColumns();
-
-        $this->applyFilters();
 
         return $this;
     }
@@ -140,11 +149,6 @@ class ModelRepository
     public function allowedColumns(array $columns): self
     {
         $this->allowedColumns = $columns;
-
-        if ($this->allowUniversalSearch) {
-            $this->applyGlobalSearch();
-        }
-
         return $this;
     }
 
@@ -160,14 +164,16 @@ class ModelRepository
 
     public function addRelation($relation)
     {
-        $this->modelQuery = $this->modelQuery->with($relation);
+        if (is_string($relation)){
+            array_push($this->relations, $relation);
+        }
+
+        if (is_array($relation)){
+            $this->relations = array_merge($this->relations, $relation);
+        }
         return $this;
     }
 
-    /**
-     * Return the first item
-     *
-     */
     public function first()
     {
         return $this->applyAllowedColumns($this->modelQuery)->first();
@@ -181,7 +187,7 @@ class ModelRepository
      */
     private function applyAllowedColumns($query)
     {
-        $query = $this->applySortBy($query);
+        $query = $this->applySortBy($query)->with($this->relations);
 
         if ($this->allowPaginate) {
             return $this->allowedColumns ? $query->paginate($this->perPage, $this->allowedColumns) : $query->paginate($this->perPage);
@@ -190,9 +196,11 @@ class ModelRepository
         return $this->allowedColumns ? $query->get($this->allowedColumns) : $query->get();
     }
 
-    public function applySearch(array $filters)
+    public function addSearch(array $filters): ModelRepository
     {
-        dd($filters);
+        $this->addedSearch = $filters;
+
+        return $this;
     }
 
     /**
