@@ -16,11 +16,4 @@ class BuildTest extends TestCase
         $this->assertArrayHasKey("condition", $response);
         $this->assertArrayHasKey("query", $response);
     }
-
-    public function testTableColumnTypeHasABuild()
-    {
-        $response = BuildRepository::build()->classNameFromColumnType("bigInteger");
-
-        $this->assertEquals("Integer", $response);
-    }
 }
