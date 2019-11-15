@@ -2,8 +2,6 @@ language: php
 
 sudo: true
 
-install: composer
-
 php:
   - 7.2
 
@@ -24,3 +22,4 @@ cache:
     
 before_script:
   - travis_retry composer self-update
+  - composer install
