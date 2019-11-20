@@ -45,7 +45,7 @@ class Search
     public function build()
     {
         return BuildRepository::build();
-        }
+    }
 
     public function table($tableName)
     {
