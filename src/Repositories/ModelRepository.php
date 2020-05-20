@@ -220,8 +220,11 @@ class ModelRepository
         return $this->applyAllowedColumns($this->modelQuery);
     }
 
-    public function buildQuery($queryType, $queryParameters)
+    public function buildQuery($queryType = null, $queryParameters = null)
     {
+        if ($queryType === null|| $queryParameters === null){
+            return $this;
+        }
         $this->modelQuery = $this->modelQuery->{$queryType}(...$queryParameters);
 
         return $this;
