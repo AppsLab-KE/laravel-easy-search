@@ -225,6 +225,7 @@ class ModelRepository
         if ($queryType === null|| $queryParameters === null){
             return $this;
         }
+
         $this->modelQuery = $this->modelQuery->{$queryType}(...$queryParameters);
 
         return $this;
