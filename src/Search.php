@@ -60,7 +60,12 @@ class Search
      */
     public function autogenerateQuery($tableName, string $columnName): array
     {
-        $getColumnType = $this->table($tableName)->getColumnType($columnName);
+        try {
+            $getColumnType = $this->table($tableName)->getColumnType($columnName);
+        } catch (\Exception $exception){
+            $getColumnType = 'string';
+        }
+
         $className = $this->build()->classNameFromColumnType($getColumnType);
 
         return $this->build()->query($className);
