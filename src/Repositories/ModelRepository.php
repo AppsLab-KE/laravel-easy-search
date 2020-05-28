@@ -222,7 +222,7 @@ class ModelRepository
 
     public function buildQuery($queryType = null, $queryParameters = null)
     {
-        if ($queryType === null|| $queryParameters === null){
+        if ($queryType === null || $queryParameters === null) {
             return $this;
         }
 

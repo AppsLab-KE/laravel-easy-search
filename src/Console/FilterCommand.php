@@ -61,14 +61,13 @@ class FilterCommand extends GeneratorCommand
                 $autogenerate = false;
             }
 
-            if (count($getValidTableColumns) < 1  && !$this->option('force')) {
-
+            if (count($getValidTableColumns) < 1 && ! $this->option('force')) {
                 $this->error('Column not found in the table. Columns are case sensitive');
 
                 return;
             }
 
-            if (count($getValidTableColumns) < 1 && $this->option('force')){
+            if (count($getValidTableColumns) < 1 && $this->option('force')) {
                 $getValidTableColumns = $getEnteredColumns;
             }
 
