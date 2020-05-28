@@ -3,7 +3,6 @@
 namespace AppsLab\LaravelEasySearch\Console;
 
 use AppsLab\LaravelEasySearch\Contracts\GeneratorCommand;
-use AppsLab\LaravelEasySearch\Exceptions\QueryBuildError;
 use AppsLab\LaravelEasySearch\Facades\Search;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
@@ -63,6 +62,7 @@ class FilterCommand extends GeneratorCommand
             }
 
             if (count($getValidTableColumns) < 1  && !$this->option('force')) {
+
                 $this->error('Column not found in the table. Columns are case sensitive');
 
                 return;
