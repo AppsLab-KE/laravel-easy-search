@@ -62,7 +62,7 @@ class Search
     {
         try {
             $getColumnType = $this->table($tableName)->getColumnType($columnName);
-        } catch (\Exception $exception){
+        } catch (\Exception $exception) {
             $getColumnType = 'string';
         }
 
