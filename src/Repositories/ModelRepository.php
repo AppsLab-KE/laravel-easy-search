@@ -3,10 +3,14 @@
 namespace AppsLab\LaravelEasySearch\Repositories;
 
 use AppsLab\LaravelEasySearch\Facades\Search;
+use AppsLab\LaravelEasySearch\Traits\Searchable;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
+use Spatie\Permission\Models\Permission;
 
 class ModelRepository
 {
+    use Searchable;
     public $model;
     public $modelQuery;
     protected $allowedColumns = null;
@@ -19,6 +23,7 @@ class ModelRepository
     public $allowAllColumnsSearch = false;
     public $allColumnsFilters = [];
     protected $relations = [];
+    public $useDbApply = false;
     protected $addedSearch = [];
 
     public function __construct(Model $model)
@@ -53,9 +58,29 @@ class ModelRepository
 
         $getQueryFilters = $this->removeIgnoredFilters($getQueryFilters);
 
-        $this->modelQuery = count($getQueryFilters) > 0 ? $this->model->apply($getQueryFilters) : $this->model->newQuery();
+        if (!$this->useDbApply) {
+            $this->modelQuery = count($getQueryFilters) > 0 ? $this->model->apply($getQueryFilters) : $this->model->newQuery();
+        } else {
+            $this->modelQuery = count($getQueryFilters) > 0 ? $this->apply($getQueryFilters) : $this->model->newQuery();
+        }
 
         return $this;
+    }
+
+    public function useDb()
+    {
+        $this->useDbApply = true;
+        return $this;
+    }
+
+    public function newQuery()
+    {
+        return $this->model->newQuery();
+    }
+
+    public function getTable()
+    {
+        return $this->model->getTable();
     }
 
     private function removeIgnoredFilters($getQueryFilters): array
@@ -112,10 +137,12 @@ class ModelRepository
         $this->allowAllColumnsSearch = true;
         $this->allColumnsSearchKey = $parameter ?? $this->allColumnsSearchKey;
 
-        $this->allColumnsFilters = array_filter(DatabaseRepository::conn($this->model->getTable())->getTableColumns(),
+        $this->allColumnsFilters = array_filter(
+            DatabaseRepository::conn($this->model->getTable())->getTableColumns(),
             function ($column) use ($ignoredColumns) {
-                return ! in_array($column, $ignoredColumns);
-            });
+                return !in_array($column, $ignoredColumns);
+            }
+        );
 
         $this->allowedColumns = DatabaseRepository::conn($this->model->getTable())->getTableColumns();
 
