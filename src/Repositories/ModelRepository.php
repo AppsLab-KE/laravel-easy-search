@@ -5,8 +5,6 @@ namespace AppsLab\LaravelEasySearch\Repositories;
 use AppsLab\LaravelEasySearch\Facades\Search;
 use AppsLab\LaravelEasySearch\Traits\Searchable;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\DB;
-use Spatie\Permission\Models\Permission;
 
 class ModelRepository
 {
@@ -58,7 +56,7 @@ class ModelRepository
 
         $getQueryFilters = $this->removeIgnoredFilters($getQueryFilters);
 
-        if (!$this->useDbApply) {
+        if (! $this->useDbApply) {
             $this->modelQuery = count($getQueryFilters) > 0 ? $this->model->apply($getQueryFilters) : $this->model->newQuery();
         } else {
             $this->modelQuery = count($getQueryFilters) > 0 ? $this->apply($getQueryFilters) : $this->model->newQuery();
@@ -70,6 +68,7 @@ class ModelRepository
     public function useDb()
     {
         $this->useDbApply = true;
+
         return $this;
     }
 
@@ -140,7 +139,7 @@ class ModelRepository
         $this->allColumnsFilters = array_filter(
             DatabaseRepository::conn($this->model->getTable())->getTableColumns(),
             function ($column) use ($ignoredColumns) {
-                return !in_array($column, $ignoredColumns);
+                return ! in_array($column, $ignoredColumns);
             }
         );
 
