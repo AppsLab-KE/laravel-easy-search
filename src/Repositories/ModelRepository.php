@@ -65,6 +65,13 @@ class ModelRepository
         return $this;
     }
 
+    public function ignoreFilters(array $ignoreFilters)
+    {
+        $this->ignoredFilters = array_merge($this->ignoredFilters, $ignoreFilters);
+
+        return $this;
+    }
+
     public function useDb()
     {
         $this->useDbApply = true;
