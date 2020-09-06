@@ -56,7 +56,7 @@ class ModelRepository
 
         $getQueryFilters = $this->removeIgnoredFilters($getQueryFilters);
 
-        if (!$this->useDbApply) {
+        if (! $this->useDbApply) {
             $this->modelQuery = count($getQueryFilters) > 0 ? $this->model->apply($getQueryFilters) : $this->model->newQuery();
         } else {
             $this->modelQuery = count($getQueryFilters) > 0 ? $this->apply($getQueryFilters) : $this->model->newQuery();
