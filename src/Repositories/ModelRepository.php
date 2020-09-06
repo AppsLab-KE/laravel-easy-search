@@ -56,7 +56,7 @@ class ModelRepository
 
         $getQueryFilters = $this->removeIgnoredFilters($getQueryFilters);
 
-        if (! $this->useDbApply) {
+        if (!$this->useDbApply) {
             $this->modelQuery = count($getQueryFilters) > 0 ? $this->model->apply($getQueryFilters) : $this->model->newQuery();
         } else {
             $this->modelQuery = count($getQueryFilters) > 0 ? $this->apply($getQueryFilters) : $this->model->newQuery();
@@ -138,15 +138,15 @@ class ModelRepository
      * @param array $ignoredColumns
      * @return $this
      */
-    public function searchAllColumns(string $parameter = null, array $ignoredColumns = [])
+    public function searchAllColumns(string $parameter = null, array $searchColumns = [])
     {
         $this->allowAllColumnsSearch = true;
         $this->allColumnsSearchKey = $parameter ?? $this->allColumnsSearchKey;
 
         $this->allColumnsFilters = array_filter(
             DatabaseRepository::conn($this->model->getTable())->getTableColumns(),
-            function ($column) use ($ignoredColumns) {
-                return ! in_array($column, $ignoredColumns);
+            function ($column) use ($searchColumns) {
+                return $searchColumns[0] == '*' ? true : in_array($column, $searchColumns);
             }
         );
 
