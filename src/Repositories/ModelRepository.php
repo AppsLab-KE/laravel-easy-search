@@ -140,6 +140,9 @@ class ModelRepository
      */
     public function searchAllColumns(string $parameter = null, array $searchColumns = [])
     {
+        if (empty($searchColumns)) {
+            return $this;
+        }
         $this->allowAllColumnsSearch = true;
         $this->allColumnsSearchKey = $parameter ?? $this->allColumnsSearchKey;
 
