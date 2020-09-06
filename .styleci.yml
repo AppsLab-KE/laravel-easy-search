@@ -7,5 +7,4 @@ finder:
     - "vendor"
 disabled:
   - single_class_element_per_statement
-  - self_accessor
   - concat_without_spaces
