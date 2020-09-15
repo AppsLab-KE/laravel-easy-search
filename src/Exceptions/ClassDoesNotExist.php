@@ -1,6 +1,6 @@
 <?php
 
-namespace AppsLab\LaravelEasySearch;
+namespace AppsLab\LaravelEasySearch\Exceptions;
 
 use Exception;
 
