@@ -2,10 +2,10 @@
 
 namespace AppsLab\LaravelEasySearch;
 
+use AppsLab\LaravelEasySearch\Exceptions\ClassDoesNotExist;
 use AppsLab\LaravelEasySearch\Repositories\BuildRepository;
 use AppsLab\LaravelEasySearch\Repositories\DatabaseRepository;
 use AppsLab\LaravelEasySearch\Repositories\ModelRepository;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 
 class Search
